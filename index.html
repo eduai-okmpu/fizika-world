@@ -4,191 +4,165 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Әртүрлі температурадағы суды араластыру — онлайн зертхана</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --ink:#1f2a37; --accent:#b4235a; --line:#cdc6b8; --btn:#2f6fae; --btn-d:#9aa6b2;
+    --paper:#E4EAEE;
+    --ink:#18283A;
+    --ink-2:#4A5B6C;
+    --line:#9FB0BE;
+    --hot:#D9480F;
+    --cold:#2F5DA8;
+    --display:"Unbounded","Golos Text",system-ui,sans-serif;
+    --text:"Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   }
   *{box-sizing:border-box}
   html,body{margin:0}
-  body{
-    font-family:"Segoe UI",Roboto,"Noto Sans","Helvetica Neue",Arial,sans-serif;
-    background:#ece8df; color:var(--ink);
+  body{background:var(--paper);color:var(--ink);font-family:var(--text);font-size:16px;line-height:1.5}
+  .lab{max-width:1200px;margin:0 auto;padding:28px 20px 32px}
+  h1{
+    font-family:var(--display);font-weight:600;letter-spacing:-.015em;line-height:1.15;
+    font-size:clamp(20px,2.7vw,34px);margin:0 0 4px;max-width:30ch;
   }
-  header{text-align:center;padding:16px 12px 4px}
-  h1{margin:0;font-size:clamp(17px,2.3vw,28px);font-weight:700;color:var(--accent);line-height:1.25}
-  .wrap{overflow-x:auto;padding:10px 12px 6px}
-  .stage{
-    position:relative;width:100%;max-width:1200px;min-width:760px;margin:0 auto;
-    aspect-ratio:1000/620;container-type:inline-size;
-    border-radius:14px;overflow:hidden;box-shadow:0 10px 30px rgba(60,50,30,.18);
-    user-select:none;-webkit-user-select:none;
-  }
-  .stage>svg{position:absolute;inset:0;width:100%;height:100%;display:block}
-  .ov{position:absolute}
-  .panel{
-    background:rgba(255,253,248,.95);border:1px solid var(--line);border-radius:1cqw;
-    padding:.9cqw 1.3cqw;box-shadow:0 .3cqw .9cqw rgba(0,0,0,.08);
-  }
-  .panel h2{margin:0 0 .5cqw;font-size:1.55cqw;font-weight:600;color:var(--accent);text-align:center;line-height:1.2}
-  .row{display:flex;align-items:center;justify-content:center;gap:.6cqw;font-size:1.6cqw;margin:.3cqw 0}
-  .row label{min-width:3.6cqw;text-align:right}
-  .row input{
-    width:7.5cqw;font:inherit;padding:.1cqw .5cqw;border:none;border-bottom:1px solid #8a8577;
-    background:transparent;color:var(--ink);border-radius:0;
-  }
-  .row input:focus{outline:none;border-bottom:2px solid var(--btn);background:#f3f7fc}
-  .row input:disabled{color:#4b5563;border-bottom-color:#cfc9bc}
-  .row input.bad{border-bottom:2px solid #d03b3b;background:#fdeeee}
-  .row .u{color:#555;min-width:1.6cqw}
-  .tval{font-size:2cqw;font-weight:600;text-align:center;margin-top:.2cqw}
-  .ctrl{display:flex;align-items:center;gap:1cqw;justify-content:center;padding:.5cqw 0 0;border-top:1px solid #e6e0d3;margin-top:.5cqw}
-  .timer{
-    font-variant-numeric:tabular-nums;font-size:1.7cqw;min-width:8cqw;text-align:right;
-    border-bottom:1px solid #8a8577;padding:0 .4cqw;
-  }
-  .cbtn{
-    display:flex;flex-direction:column;align-items:center;gap:.2cqw;background:none;border:none;
-    font:inherit;font-size:1.2cqw;color:var(--ink);cursor:pointer;padding:.2cqw .3cqw;border-radius:.6cqw;
-  }
-  .cbtn .ic{
-    width:2.6cqw;height:2.6cqw;border-radius:50%;display:grid;place-items:center;
-    background:radial-gradient(circle at 35% 30%,#f4f6f3,#a9b1a6);box-shadow:inset 0 -.15cqw .3cqw rgba(0,0,0,.25),0 .1cqw .2cqw rgba(0,0,0,.2);
-  }
-  .cbtn svg{width:1.3cqw;height:1.3cqw;fill:#3d4a3c}
-  .cbtn:hover:not(:disabled) .ic{background:radial-gradient(circle at 35% 30%,#ffffff,#b9d2e8)}
-  .cbtn:disabled{opacity:.4;cursor:default}
-  .cbtn.on .ic{background:radial-gradient(circle at 35% 30%,#fff,#f0c36d)}
-  .act{
-    font:inherit;font-size:1.4cqw;font-weight:600;color:#fff;background:var(--btn);
-    border:none;border-radius:2cqw;padding:.55cqw 1.1cqw;cursor:pointer;white-space:nowrap;
-    box-shadow:0 .2cqw .5cqw rgba(0,0,0,.2);transform:translateX(-50%);
-  }
-  .act:hover:not(:disabled){background:#245a90}
-  .act:disabled{background:var(--btn-d);cursor:default;box-shadow:none}
-  .act.hot{background:#c0392b}
-  .act.hot:hover:not(:disabled){background:#a12f23}
-  .act.hot:disabled{background:var(--btn-d)}
-  #status{
-    max-width:1200px;min-width:0;margin:10px auto 22px;padding:10px 16px;
-    background:#fffdf8;border:1px solid var(--line);border-radius:10px;
-    font-size:clamp(14px,1.5vw,17px);line-height:1.45;min-height:1.45em;
-  }
-  #status.warn{border-color:#e0a2a2;background:#fdf1f1;color:#8b1e1e}
+  .scene{display:block;width:100%;height:auto}
   .clickable{cursor:pointer}
+
+  /* ---- станциялар ---- */
+  .stations{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:6px}
+  .station{justify-self:center;width:100%;max-width:350px;display:flex;flex-direction:column;gap:10px}
+  .station h2{margin:0;font-family:var(--display);font-weight:600;font-size:17px;letter-spacing:-.01em}
+  .station.hot h2{color:var(--hot)}
+  .station.cold h2{color:var(--cold)}
+  .fields{display:flex;gap:18px}
+  .field{display:flex;align-items:baseline;gap:6px}
+  .field label{font-size:17px;color:var(--ink-2)}
+  .field input{
+    width:64px;font-family:var(--display);font-weight:500;font-size:20px;color:var(--ink);
+    background:transparent;border:none;border-bottom:2px solid var(--line);padding:2px 2px 3px;border-radius:0;
+  }
+  .field input:focus{outline:none;border-bottom-color:var(--ink)}
+  .field input:disabled{color:var(--ink-2);border-bottom-style:dotted}
+  .field input.bad{border-bottom-color:var(--hot);color:var(--hot)}
+  .field .u{color:var(--ink-2)}
+  .acts{display:flex;flex-wrap:wrap;gap:8px}
+  .btn{
+    font:inherit;font-weight:600;font-size:15px;border-radius:999px;padding:8px 16px;cursor:pointer;
+    border:2px solid var(--ink);background:transparent;color:var(--ink);
+  }
+  .btn:hover:not(:disabled){background:var(--ink);color:var(--paper)}
+  .btn.heat{border-color:var(--hot);background:var(--hot);color:#fff}
+  .btn.heat:hover:not(:disabled){background:#B53A0A;border-color:#B53A0A}
+  .btn.heat.on{background:transparent;color:var(--hot)}
+  .btn.heat.on:hover:not(:disabled){background:var(--hot);color:#fff}
+  .btn:disabled{opacity:.35;cursor:default}
+  .btn:focus-visible,.tbtn:focus-visible,.field input:focus-visible{outline:3px solid #7AA2D8;outline-offset:2px}
+
+  .station.cal{align-items:center;text-align:center}
+  .readout{display:flex;align-items:center;gap:12px;font-family:var(--display);font-weight:600;font-size:clamp(26px,3.4vw,40px);letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .swatch{width:.62em;height:.62em;border-radius:50%;border:2px solid var(--ink);flex:none}
+
+  /* ---- басқару жолағы ---- */
+  .bar{
+    margin-top:26px;background:var(--ink);color:#E9EFF3;border-radius:14px;
+    display:flex;align-items:center;gap:22px;padding:14px 20px;flex-wrap:wrap;
+  }
+  .transport{display:flex;gap:6px}
+  .tbtn{
+    display:flex;align-items:center;gap:8px;font:inherit;font-weight:600;font-size:15px;color:#E9EFF3;
+    background:transparent;border:none;padding:6px 12px 6px 6px;border-radius:999px;cursor:pointer;
+  }
+  .tbtn .ic{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;border:2px solid #6E8296}
+  .tbtn svg{width:12px;height:12px;fill:#E9EFF3}
+  .tbtn:hover:not(:disabled) .ic{border-color:#E9EFF3}
+  .tbtn.on .ic{background:#E9EFF3;border-color:#E9EFF3}
+  .tbtn.on svg{fill:var(--ink)}
+  .tbtn:disabled{opacity:.4;cursor:default}
+  .tbtn.on:disabled{opacity:1}
+  .clock{font-family:var(--display);font-weight:500;font-size:18px;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .clock small{font-family:var(--text);font-size:14px;color:#9FB0BE;font-weight:400;margin-right:6px}
+  #status{flex:1 1 320px;font-size:15px;line-height:1.45;color:#C9D5DE;max-width:70ch}
+  #status.warn{color:#FFB08A}
+
+  @media (max-width:760px){
+    .lab{padding:20px 14px 24px}
+    .stations{grid-template-columns:1fr;gap:22px}
+    .station,.station.cal{max-width:none;align-items:flex-start;text-align:left}
+    .station.cal{order:-1}
+    .bar{gap:14px}
+  }
+  .wave{stroke-dasharray:6 10;animation:rise 1.1s linear infinite}
+  @keyframes rise{to{stroke-dashoffset:-32}}
+  @media (prefers-reduced-motion:reduce){ .wave{animation:none} }
 </style>
 </head>
 <body>
-<header>
+<main class="lab">
   <h1>Әртүрлі температурадағы суды араластырған кезде жылу мөлшерлерін салыстыру</h1>
-</header>
 
-<div class="wrap">
-<div class="stage" id="stage">
-  <svg id="scene" viewBox="0 0 1000 620" aria-label="Зертхана үстелі">
+  <svg class="scene" id="scene" viewBox="0 60 1200 470" role="img" aria-label="Ыстық су плиткада, ортада калориметр, оң жақта суық су">
     <defs>
-      <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#eef0ea"/><stop offset="1" stop-color="#d9d8cc"/>
-      </linearGradient>
-      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#e9f3fb"/><stop offset="1" stop-color="#cfe2ef"/>
-      </linearGradient>
-      <linearGradient id="table" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#a8b39a"/><stop offset="1" stop-color="#7f8b72"/>
-      </linearGradient>
-      <linearGradient id="glass" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0" stop-color="#6f7780" stop-opacity=".35"/>
-        <stop offset=".12" stop-color="#ffffff" stop-opacity=".55"/>
-        <stop offset=".3" stop-color="#c9d1d8" stop-opacity=".18"/>
-        <stop offset=".8" stop-color="#c9d1d8" stop-opacity=".14"/>
-        <stop offset=".92" stop-color="#ffffff" stop-opacity=".4"/>
-        <stop offset="1" stop-color="#6f7780" stop-opacity=".4"/>
-      </linearGradient>
-      <linearGradient id="water" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0" stop-color="#2f80c6"/><stop offset=".35" stop-color="#6db8ec"/>
-        <stop offset=".7" stop-color="#4fa3e0"/><stop offset="1" stop-color="#2a76b8"/>
-      </linearGradient>
-      <linearGradient id="plateBody" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d4d6d8"/>
-      </linearGradient>
-      <radialGradient id="glow" cx=".5" cy=".5" r=".5">
-        <stop offset="0" stop-color="#ff5a1f"/><stop offset=".7" stop-color="#d5301a"/><stop offset="1" stop-color="#7a1608"/>
-      </radialGradient>
-      <linearGradient id="card" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0" stop-color="#f7f7f2"/><stop offset="1" stop-color="#e7e6de"/>
-      </linearGradient>
-      <linearGradient id="tube" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0" stop-color="#b9c3cc"/><stop offset=".5" stop-color="#f4f7fa"/><stop offset="1" stop-color="#aab4bd"/>
-      </linearGradient>
-      <radialGradient id="bulb" cx=".38" cy=".35" r=".7">
-        <stop offset="0" stop-color="#f08a8a"/><stop offset=".45" stop-color="#b3191d"/><stop offset="1" stop-color="#6d0a0d"/>
-      </radialGradient>
-      <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
-        <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000" flood-opacity=".18"/>
-      </filter>
+      <linearGradient id="ironbow" gradientUnits="userSpaceOnUse" x1="0" y1="440" x2="0" y2="230"></linearGradient>
+      <pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <rect width="8" height="8" fill="#EEF2F5"/>
+        <line x1="0" y1="0" x2="0" y2="8" stroke="#B9C6D0" stroke-width="2"/>
+      </pattern>
     </defs>
 
-    <!-- фон: қабырға, терезелер, үстел -->
-    <rect x="0" y="0" width="1000" height="620" fill="url(#wall)"/>
-    <g opacity=".55">
-      <rect x="250" y="10" width="160" height="250" rx="4" fill="url(#sky)" stroke="#b9bcb2" stroke-width="6"/>
-      <line x1="330" y1="10" x2="330" y2="260" stroke="#b9bcb2" stroke-width="5"/>
-      <line x1="250" y1="120" x2="410" y2="120" stroke="#b9bcb2" stroke-width="5"/>
-      <rect x="640" y="10" width="160" height="250" rx="4" fill="url(#sky)" stroke="#b9bcb2" stroke-width="6"/>
-      <line x1="720" y1="10" x2="720" y2="260" stroke="#b9bcb2" stroke-width="5"/>
-      <line x1="640" y1="120" x2="800" y2="120" stroke="#b9bcb2" stroke-width="5"/>
-    </g>
-    <rect x="0" y="300" width="1000" height="6" fill="#c8c6b8" opacity=".6"/>
-    <rect x="0" y="518" width="1000" height="102" fill="url(#table)"/>
-    <rect x="0" y="514" width="1000" height="6" fill="#c3cbb6"/>
+    <!-- үстел -->
+    <rect x="0" y="500" width="1200" height="30" fill="#D5DEE4"/>
+    <line x1="0" y1="500" x2="1200" y2="500" stroke="#18283A" stroke-width="2"/>
 
-    <g id="thermos"></g>
+    <g id="gauges"></g>
+    <g id="cable"></g>
     <g id="plate" class="clickable"></g>
     <g id="calor"></g>
-    <path id="stream" d="" fill="none" stroke="#4fa3e0" stroke-width="7" stroke-linecap="round" opacity="0"/>
+    <path id="stream" d="" fill="none" stroke-width="7" stroke-linecap="round" opacity="0"/>
     <g id="coldV"></g>
     <g id="hotV"></g>
   </svg>
 
-  <!-- Ыстық су -->
-  <div class="ov panel" style="left:2.5%;top:2.9%;width:23%">
-    <h2>Ыстық судың параметрлері</h2>
-    <div class="row"><label for="V1">V₁ =</label><input id="V1" inputmode="decimal" value="2"><span class="u">л</span></div>
-    <div class="row"><label for="t1">t₁ =</label><input id="t1" inputmode="decimal" value="40"><span class="u">°C</span></div>
-  </div>
+  <section class="stations">
+    <div class="station hot">
+      <h2>Ыстық су</h2>
+      <div class="fields">
+        <div class="field"><label for="V1">V₁ =</label><input id="V1" inputmode="decimal" value="2" autocomplete="off"><span class="u">л</span></div>
+        <div class="field"><label for="t1">t₁ =</label><input id="t1" inputmode="decimal" value="40" autocomplete="off"><span class="u">°C</span></div>
+      </div>
+      <div class="acts">
+        <button class="btn heat" id="bPlate">Плитканы қосу</button>
+        <button class="btn" id="bPourHot">Калориметрге құю</button>
+      </div>
+    </div>
 
-  <!-- Калориметр және басқару блогы -->
-  <div class="ov panel" style="left:38%;top:2%;width:24%;padding-bottom:.5cqw">
-    <h2>Калориметрдегі су</h2>
-    <div class="tval" id="tCal">t = 20,00 °C</div>
-  <div class="ctrl">
-    <div class="timer" id="timer">0,0</div>
-    <button class="cbtn" id="bStart" title="Пуск">
-      <span class="ic"><svg viewBox="0 0 10 10"><path d="M2.5 1.5 L8.5 5 L2.5 8.5Z"/></svg></span>Пуск
-    </button>
-    <button class="cbtn" id="bPause" title="Пауза">
-      <span class="ic"><svg viewBox="0 0 10 10"><rect x="2" y="1.5" width="2.2" height="7"/><rect x="5.8" y="1.5" width="2.2" height="7"/></svg></span>Пауза
-    </button>
-    <button class="cbtn" id="bStop" title="Стоп">
-      <span class="ic"><svg viewBox="0 0 10 10"><rect x="2" y="2" width="6" height="6"/></svg></span>Стоп
-    </button>
-  </div>
-  </div>
+    <div class="station cal">
+      <h2>Калориметр</h2>
+      <div class="readout" aria-live="polite"><span class="swatch" id="swatch"></span><span id="tCal">t = 20,00 °C</span></div>
+    </div>
 
-  <!-- Суық су -->
-  <div class="ov panel" style="left:74.5%;top:2.9%;width:23%">
-    <h2>Суық судың параметрлері</h2>
-    <div class="row"><label for="V2">V₂ =</label><input id="V2" inputmode="decimal" value="1,5"><span class="u">л</span></div>
-    <div class="row"><label for="t2">t₂ =</label><input id="t2" inputmode="decimal" value="21"><span class="u">°C</span></div>
+    <div class="station cold">
+      <h2>Суық су</h2>
+      <div class="fields">
+        <div class="field"><label for="V2">V₂ =</label><input id="V2" inputmode="decimal" value="1,5" autocomplete="off"><span class="u">л</span></div>
+        <div class="field"><label for="t2">t₂ =</label><input id="t2" inputmode="decimal" value="21" autocomplete="off"><span class="u">°C</span></div>
+      </div>
+      <div class="acts">
+        <button class="btn" id="bPourCold">Калориметрге құю</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="bar">
+    <div class="transport">
+      <button class="tbtn" id="bStart"><span class="ic"><svg viewBox="0 0 10 10"><path d="M2.2 1 L9 5 L2.2 9Z"/></svg></span>Пуск</button>
+      <button class="tbtn" id="bPause"><span class="ic"><svg viewBox="0 0 10 10"><rect x="1.5" y="1" width="2.6" height="8"/><rect x="5.9" y="1" width="2.6" height="8"/></svg></span>Пауза</button>
+      <button class="tbtn" id="bStop"><span class="ic"><svg viewBox="0 0 10 10"><rect x="1.5" y="1.5" width="7" height="7"/></svg></span>Стоп</button>
+    </div>
+    <div class="clock"><small>Уақыт</small><span id="timer">0,0</span> с</div>
+    <div id="status" aria-live="polite"></div>
   </div>
-
-  <!-- Сахнадағы әрекет батырмалары -->
-  <button class="ov act hot" id="bPourHot" style="left:23%;top:48.4%">Құю →</button>
-  <button class="ov act" id="bPourCold" style="left:78%;top:60.5%">← Құю</button>
-  <button class="ov act hot" id="bPlate" style="left:23%;top:92%">Плитканы қосу</button>
-</div>
-</div>
-
-<div id="status"></div>
+</main>
 
 <script>
 (() => {
@@ -203,18 +177,35 @@
 
   // ---------- Геометрия ----------
   const G = {
-    hot:  {x0:160, x1:300, top:350, bot:500, k:43.3, ry:8, maxL:3},
-    cold: {x0:710, x1:850, top:425, bot:575, k:43.3, ry:8, maxL:3},
-    cal:  {x0:480, x1:640, top:283, bot:575, k:52,   ry:10, maxL:5.5},
-    plate:{x0:140, x1:320, top:500, bot:560},
-    th: { hot:{x:22,y:205}, cal:{x:392,y:205}, cold:{x:880,y:205}, w:72, h:340 }
+    hot:   {x0:160, x1:280, top:305, bot:455, k:43.3, maxL:3},
+    cold:  {x0:920, x1:1040, top:350, bot:500, k:43.3, maxL:3},
+    cal:   {x0:522, x1:678, top:216, bot:486, k:50, maxL:5},
+    jacket:{x0:500, x1:700, top:200, bot:500},
+    plate: {x0:130, x1:310, top:455, bot:500},
+    gauge: {yTop:230, yBot:440, x:{hot:78, cal:765, cold:1122}}
   };
-  // Құю кезіндегі ыдыстың шеті (айналу нүктесі) және оның калориметр үстіндегі орны
   const POUR = {
-    hot:  {px:G.hot.x1,  py:G.hot.top,  tx:500, ty:272, ang: 70},
-    cold: {px:G.cold.x0, py:G.cold.top, tx:620, ty:272, ang:-70}
+    hot:  {px:G.hot.x1,  py:G.hot.top,  tx:540, ty:192, ang: 70},
+    cold: {px:G.cold.x0, py:G.cold.top, tx:660, ty:192, ang:-70}
   };
-  const PH = {move:0.9, tilt:0.6, pour:2.2, untilt:0.5, back:0.9}; // секунд (нақты уақыт)
+  const PH = {move:0.9, tilt:0.6, pour:2.2, untilt:0.5, back:0.9};
+  const STIR_X = 578, PROBE_X = 622;
+
+  // Тепловизор түстері: температура → түс
+  const STOPS = [[-20,"#141a4f"],[0,"#1d3b8f"],[15,"#3557b8"],[25,"#6a3fb0"],[35,"#a63597"],
+                 [45,"#d8436f"],[60,"#f06a36"],[80,"#f9a51e"],[100,"#ffe27a"]];
+  const hex2rgb = h => [1,3,5].map(i => parseInt(h.slice(i,i+2),16));
+  function heatColor(T) {
+    T = Math.max(-20, Math.min(100, T));
+    for (let i = 1; i < STOPS.length; i++) {
+      if (T <= STOPS[i][0]) {
+        const [t0,c0] = STOPS[i-1], [t1,c1] = STOPS[i], f = (T - t0) / (t1 - t0);
+        const a = hex2rgb(c0), b = hex2rgb(c1);
+        return `rgb(${a.map((v,j) => Math.round(v + (b[j]-v)*f)).join(",")})`;
+      }
+    }
+    return STOPS[STOPS.length-1][1];
+  }
 
   const NS = "http://www.w3.org/2000/svg";
   const $ = id => document.getElementById(id);
@@ -225,110 +216,123 @@
     return e;
   };
   const fmt = (x, d) => x.toFixed(d).replace(".", ",").replace(/^-0(,0+)?$/, "0$1");
-  const signed = (x, d) => (x > 0.0001 ? "+" : "") + fmt(x, d);
   const ease = t => t < .5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2)/2;
+  const INK = "#18283A";
+  const FT = "Golos Text, system-ui, sans-serif", FD = "Unbounded, Golos Text, system-ui, sans-serif";
 
-  // ---------- Термометрлер ----------
-  const thermo = {};
-  function buildThermo(key, label) {
-    const {x, y} = G.th[key], w = G.th.w, h = G.th.h;
-    const g = el("g", {filter:"url(#shadow)"}, $("thermos"));
-    el("rect", {x, y, width:w, height:h, rx:8, fill:"url(#card)", stroke:"#b7b6aa"}, g);
-    const tx = el("text", {x:x+w/2, y:y+24, "text-anchor":"middle", "font-size":15, "font-weight":700, fill:"#333"}, g);
-    tx.textContent = "°C";
-    const tubeX = x + 18, yTop = y + 45, yBot = y + h - 75; // 100°C ... -20°C
-    el("rect", {x:tubeX, y:yTop-12, width:9, height:(yBot-yTop)+40, rx:4.5, fill:"url(#tube)", stroke:"#9aa3ab", "stroke-width":.8}, g);
-    for (let T = -20; T <= 100; T += 2) {
-      const yy = yBot - (T + 20) / 120 * (yBot - yTop);
-      const major = T % 10 === 0;
-      el("line", {x1:tubeX+12, x2:tubeX+(major?24:18), y1:yy, y2:yy, stroke:"#333", "stroke-width":major?1.4:.8}, g);
+  for (const [T, c] of STOPS) el("stop", {offset:((T+20)/120).toFixed(3), "stop-color":c}, $("ironbow"));
+
+  // ---------- Термометрлер (тепловизор шкаласы) ----------
+  const gauges = {};
+  const yOf = T => G.gauge.yBot - (Math.max(-20, Math.min(100, T)) + 20) / 120 * (G.gauge.yBot - G.gauge.yTop);
+  function buildGauge(key) {
+    const x = G.gauge.x[key], {yTop, yBot} = G.gauge;
+    const g = el("g", {}, $("gauges"));
+    const u = el("text", {x, y:yTop-18, "text-anchor":"middle", "font-size":13, fill:"#4A5B6C", "font-family":FT}, g);
+    u.textContent = "°C";
+    el("rect", {x:x-6, y:yTop-8, width:12, height:(yBot-yTop)+16, rx:6, fill:"url(#ironbow)", opacity:.22}, g);
+    const fill = el("rect", {x:x-6, y:yBot, width:12, height:8, rx:6, fill:"url(#ironbow)"}, g);
+    el("rect", {x:x-6, y:yTop-8, width:12, height:(yBot-yTop)+16, rx:6, fill:"none", stroke:INK, "stroke-width":1.5}, g);
+    for (let T = -20; T <= 100; T += 5) {
+      const yy = yOf(T), major = T % 10 === 0;
+      el("line", {x1:x-10, x2:x-(major?18:14), y1:yy, y2:yy, stroke:INK, "stroke-width":major?1.4:.8}, g);
       if (major) {
-        const t = el("text", {x:tubeX+27, y:yy+3.5, "font-size":10, fill:"#333"}, g);
+        const t = el("text", {x:x-22, y:yy+4, "text-anchor":"end", "font-size":11, fill:"#4A5B6C", "font-family":FT}, g);
         t.textContent = T;
       }
     }
-    const col = el("rect", {x:tubeX+2.5, y:yBot, width:4, height:10, fill:"#c0181d"}, g);
-    el("circle", {cx:tubeX+4.5, cy:y+h-50, r:12, fill:"url(#bulb)"}, g);
-    const rd = el("text", {x:x+w/2, y:y+h-12, "text-anchor":"middle", "font-size":14.5, "font-weight":600, fill:"#9b1c1c"}, g);
-    thermo[key] = {col, rd, yTop, yBot, bulbTop:y+h-58};
+    const ptr = el("g", {}, g);
+    el("path", {d:`M${x+8} 0 l12 -7 v14 Z`, fill:INK}, ptr);
+    el("line", {x1:x-6, x2:x+8, y1:0, y2:0, stroke:INK, "stroke-width":2}, ptr);
+    const rd = el("text", {x, y:yBot+36, "text-anchor":"middle", "font-size":17, "font-weight":600, fill:INK, "font-family":FD}, g);
+    gauges[key] = {fill, ptr, rd};
   }
-  function setThermo(key, T) {
-    const th = thermo[key];
-    const Tc = Math.max(-20, Math.min(102, T));
-    const yy = th.yBot - (Tc + 20) / 120 * (th.yBot - th.yTop);
-    th.col.setAttribute("y", yy);
-    th.col.setAttribute("height", Math.max(0, th.bulbTop - yy));
-    th.rd.textContent = signed(T, 1) + " °C";
+  function setGauge(key, T) {
+    const gg = gauges[key], yy = yOf(T), {yBot} = G.gauge;
+    gg.fill.setAttribute("y", yy);
+    gg.fill.setAttribute("height", Math.max(8, yBot + 8 - yy));
+    gg.ptr.setAttribute("transform", `translate(0 ${yy})`);
+    gg.rd.textContent = fmt(T, 1) + " °C";
   }
 
   // ---------- Ыдыстар ----------
   const vessels = {};
+  const beakerPath = (v, r) =>
+    `M${v.x0} ${v.top} L${v.x0} ${v.bot-r} Q${v.x0} ${v.bot} ${v.x0+r} ${v.bot} L${v.x1-r} ${v.bot} Q${v.x1} ${v.bot} ${v.x1} ${v.bot-r} L${v.x1} ${v.top}`;
   function buildVessel(key, parent) {
-    const v = G[key], cx = (v.x0 + v.x1) / 2, rx = (v.x1 - v.x0) / 2;
+    const v = G[key], cx = (v.x0 + v.x1) / 2, r = 12;
     const g = el("g", {}, parent);
     const clipId = "clip-" + key;
     const cp = el("clipPath", {id:clipId}, g);
-    el("path", {d:`M${v.x0+3} ${v.top} L${v.x0+3} ${v.bot-6} A${rx-3} ${v.ry-1} 0 0 0 ${v.x1-3} ${v.bot-6} L${v.x1-3} ${v.top} Z`}, cp);
-    // артқы ернеу және түбі
-    el("ellipse", {cx, cy:v.top, rx, ry:v.ry, fill:"#cfd6dc", "fill-opacity":.35, stroke:"#7b848c", "stroke-width":1.2}, g);
-    el("ellipse", {cx, cy:v.bot-4, rx:rx-1, ry:v.ry, fill:"#2b2f33"}, g);
-    // су
+    el("path", {d:beakerPath({x0:v.x0+1.5, x1:v.x1-1.5, top:v.top, bot:v.bot-1.5}, r) + " Z"}, cp);
+    el("path", {d:beakerPath(v, r) + " Z", fill:"#FFFFFF", opacity:.6}, g);
     const wg = el("g", {"clip-path":`url(#${clipId})`}, g);
-    const water = el("rect", {x:cx-1000, y:v.bot, width:2000, height:2000, fill:"url(#water)", opacity:.82}, wg);
-    const surf = el("ellipse", {cx, cy:v.bot, rx:rx-3, ry:v.ry-2, fill:"#9fd3f5", opacity:.75}, g);
-    // шыны
-    el("path", {d:`M${v.x0} ${v.top} L${v.x0} ${v.bot-4} A${rx} ${v.ry} 0 0 0 ${v.x1} ${v.bot-4} L${v.x1} ${v.top} Z`,
-                fill:"url(#glass)", stroke:"#6f7880", "stroke-width":1.4}, g);
-    // шкала
-    const bIn = v.bot - 6, mx = v.x0 + 12;
+    const water = el("rect", {x:cx-1000, y:v.bot+50, width:2000, height:2000, opacity:.9}, wg);
+    const surf = el("line", {x1:v.x0+2, x2:v.x1-2, y1:v.bot, y2:v.bot, stroke:"#fff", "stroke-width":2, opacity:0}, g);
+    el("path", {d:beakerPath(v, r), fill:"none", stroke:INK, "stroke-width":2.5, "stroke-linejoin":"round"}, g);
+    el("path", {d:`M${v.x0-7} ${v.top} H${v.x0} M${v.x1} ${v.top} H${v.x1+7}`, stroke:INK, "stroke-width":2.5, "stroke-linecap":"round"}, g);
+    const bIn = v.bot - 1.5;
     for (let L = 0.5; L <= v.maxL + 1e-9; L += 0.5) {
-      const yy = bIn - L * v.k;
-      if (yy < v.top + 4) break;
-      const major = Math.abs(L - Math.round(L)) < 1e-9;
-      el("path", {d:`M${mx} ${yy} q ${major?12:7} 2 ${major?24:14} 2`, fill:"none", stroke:"#222", "stroke-width":major?1.8:1.1}, g);
-      if (major) { const t = el("text", {x:mx+28, y:yy+7, "font-size":15, fill:"#222"}, g); t.textContent = L; }
+      const yy = bIn - L * v.k, major = Math.abs(L - Math.round(L)) < 1e-9;
+      el("line", {x1:v.x1-3, x2:v.x1-(major?18:10), y1:yy, y2:yy, stroke:INK, "stroke-width":major?1.6:1}, g);
+      if (major) {
+        const t = el("text", {x:v.x1-22, y:yy+4.5, "text-anchor":"end", "font-size":13, fill:INK, "font-family":FT}, g);
+        t.textContent = L + (L === v.maxL ? " л" : "");
+      }
     }
-    const lt = el("text", {x:mx+44, y:bIn - Math.floor(v.maxL) * v.k + 7, "font-size":13, "font-weight":700, fill:"#222"}, g);
-    lt.textContent = "л";
-    if (key === "cal") { const t0 = el("text", {x:mx+28, y:bIn+5, "font-size":15, fill:"#eee"}, g); t0.textContent = "0"; }
-    // алдыңғы ернеу
-    el("path", {d:`M${v.x0} ${v.top} A${rx} ${v.ry} 0 0 0 ${v.x1} ${v.top}`, fill:"none", stroke:"#5f6870", "stroke-width":1.6}, g);
     vessels[key] = {g, water, surf, cx, bIn};
   }
-  // Су бетін әлемдік көлденең күйде сақтайтын бейне (ыдыс қисайғанда да)
-  function setVesselWater(key, vol, ang) {
+  // Су беті ыдыс қисайғанда да көлденең қалады
+  function setVesselWater(key, vol, ang, T) {
     const v = G[key], vs = vessels[key];
+    vs.water.setAttribute("fill", heatColor(T));
     if (vol <= 1e-6) { vs.water.setAttribute("y", v.bot + 50); vs.water.removeAttribute("transform"); vs.surf.setAttribute("opacity", 0); return; }
     const ys = vs.bIn - vol * v.k;
     vs.water.setAttribute("y", ys);
     vs.water.setAttribute("transform", `rotate(${-ang} ${vs.cx} ${ys})`);
-    vs.surf.setAttribute("cy", ys);
-    vs.surf.setAttribute("opacity", Math.abs(ang) < 1 ? .75 : 0);
+    vs.surf.setAttribute("y1", ys); vs.surf.setAttribute("y2", ys);
+    vs.surf.setAttribute("opacity", Math.abs(ang) < 1 ? .55 : 0);
+  }
+
+  // ---------- Калориметр: қос қабырға, араластырғыш, датчик ----------
+  let stirrer;
+  function buildCalorimeter() {
+    const j = G.jacket, root = $("calor");
+    el("path", {d:beakerPath(j, 18) + " Z", fill:"url(#hatch)", stroke:INK, "stroke-width":2.5}, root);
+    el("path", {d:`M${j.x0-8} ${j.top} H${G.cal.x0} M${G.cal.x1} ${j.top} H${j.x1+8}`, stroke:INK, "stroke-width":3, "stroke-linecap":"round"}, root);
+    buildVessel("cal", root);
+    stirrer = el("g", {}, root);
+    el("line", {x1:STIR_X, x2:STIR_X, y1:140, y2:470, stroke:"#6E8296", "stroke-width":3}, stirrer);
+    el("line", {x1:STIR_X-16, x2:STIR_X+16, y1:470, y2:470, stroke:"#6E8296", "stroke-width":4, "stroke-linecap":"round"}, stirrer);
+    el("circle", {cx:STIR_X, cy:136, r:7, fill:"#fff", stroke:INK, "stroke-width":2}, stirrer);
+    el("path", {d:`M${PROBE_X} 128 C ${PROBE_X} 90, ${G.gauge.x.cal} 120, ${G.gauge.x.cal} ${G.gauge.yTop-34}`, fill:"none", stroke:INK, "stroke-width":1.6}, $("cable"));
+    el("line", {x1:PROBE_X, x2:PROBE_X, y1:146, y2:474, stroke:INK, "stroke-width":3}, root);
+    el("rect", {x:PROBE_X-8, y:126, width:16, height:22, rx:3, fill:INK}, root);
+    el("circle", {cx:PROBE_X, cy:476, r:4.5, fill:INK}, root);
   }
 
   // ---------- Плитка ----------
-  let plateGlowEl, plateLamp, plateKnob;
+  let plateGlowEl, plateLamp, plateKnob, waves;
   function buildPlate() {
-    const p = G.plate, g = $("plate"), cx = (p.x0 + p.x1) / 2;
-    el("rect", {x:p.x0+12, y:p.bot-4, width:14, height:8, rx:2, fill:"#333"}, g);
-    el("rect", {x:p.x1-26, y:p.bot-4, width:14, height:8, rx:2, fill:"#333"}, g);
-    el("path", {d:`M${p.x0} ${p.top+8} L${p.x1} ${p.top+8} L${p.x1-6} ${p.bot} L${p.x0+6} ${p.bot} Z`, fill:"url(#plateBody)", stroke:"#a9adb1"}, g);
-    el("ellipse", {cx, cy:p.top+8, rx:(p.x1-p.x0)/2, ry:12, fill:"#eceeef", stroke:"#b5b9bd"}, g);
-    el("ellipse", {cx, cy:p.top+6, rx:80, ry:9, fill:"#1d1f21"}, g);
-    plateGlowEl = el("ellipse", {cx, cy:p.top+6, rx:80, ry:9, fill:"url(#glow)", opacity:0}, g);
+    const p = G.plate, g = $("plate");
+    el("rect", {x:p.x0, y:p.top+9, width:p.x1-p.x0, height:p.bot-p.top-9, rx:6, fill:"#2B3D50"}, g);
+    el("rect", {x:p.x0+10, y:p.top, width:p.x1-p.x0-20, height:9, rx:3, fill:"#5D6B78"}, g);
+    plateGlowEl = el("rect", {x:p.x0+10, y:p.top, width:p.x1-p.x0-20, height:9, rx:3, fill:"#FF7A2E", opacity:0}, g);
+    plateLamp = el("circle", {cx:p.x0+22, cy:p.top+27, r:4.5, fill:"#4A2A2A"}, g);
     plateKnob = el("g", {}, g);
-    el("circle", {cx:cx+40, cy:p.top+36, r:11, fill:"#2b2b2b", stroke:"#111"}, plateKnob);
-    el("rect", {x:cx+39, y:p.top+26, width:2.5, height:9, fill:"#ddd"}, plateKnob);
-    plateLamp = el("circle", {cx:cx-40, cy:p.top+36, r:4.5, fill:"#5a2222", stroke:"#333"}, g);
-    // ескерту белгісі
-    el("path", {d:`M${cx+70} ${p.top+28} l7 12 h-14 Z`, fill:"#f2c31b", stroke:"#333", "stroke-width":.8}, g);
+    el("circle", {cx:p.x1-24, cy:p.top+27, r:10, fill:"#E4EAEE"}, plateKnob);
+    el("line", {x1:p.x1-24, x2:p.x1-24, y1:p.top+19, y2:p.top+26, stroke:INK, "stroke-width":2.5, "stroke-linecap":"round"}, plateKnob);
+    waves = el("g", {opacity:0}, g);
+    for (const x of [p.x0+12, p.x0+21, p.x1-21, p.x1-12]) {
+      el("path", {class:"wave", d:`M${x} ${p.top-4} q -5 -12 0 -24 q 5 -12 0 -24 q -5 -12 0 -24`, fill:"none", stroke:"#F06A36", "stroke-width":2, "stroke-linecap":"round"}, waves);
+    }
   }
 
   // ---------- Күй ----------
   const S = {};
   const inputs = {V1:$("V1"), t1:$("t1"), V2:$("V2"), t2:$("t2")};
   const P = {V1:2, t1:40, V2:1.5, t2:21};
-  let warnText = "", warnUntil = 0;
+  let warnText = "", warnUntil = 0, stirPhase = 0;
 
   function reset() {
     Object.assign(S, {
@@ -340,103 +344,78 @@
       pour:null, settled:false
     });
   }
-
-  function parseNum(s) {
-    const x = parseFloat(String(s).trim().replace(",", "."));
-    return Number.isFinite(x) ? x : NaN;
-  }
+  const parseNum = s => { const x = parseFloat(String(s).trim().replace(",", ".")); return Number.isFinite(x) ? x : NaN; };
   function warn(msg) { warnText = msg; warnUntil = performance.now() + 5000; }
 
   function applyInput(id) {
     const inp = inputs[id], x = parseNum(inp.value);
-    let ok = true, msg = "";
-    if (!Number.isFinite(x)) { ok = false; msg = "Сан енгізіңіз."; }
+    let msg = "";
+    if (!Number.isFinite(x)) msg = "Бұл өріске сан жазыңыз.";
     else if (id === "V1" || id === "V2") {
-      if (x < VMIN || x > VMAX) { ok = false; msg = `Судың көлемі ${fmt(VMIN,1)} л мен ${VMAX} л аралығында болуы керек.`; }
-      else {
-        const other = id === "V1" ? P.V2 : P.V1;
-        if (x + other > CALMAX + 1e-9) { ok = false; msg = `Екі судың жалпы көлемі калориметрдің сыйымдылығынан (${CALMAX} л) аспауы керек.`; }
-      }
+      const other = id === "V1" ? P.V2 : P.V1;
+      if (x < VMIN || x > VMAX) msg = `Судың көлемі ${fmt(VMIN,1)} л мен ${VMAX} л аралығында болуы керек.`;
+      else if (x + other > CALMAX + 1e-9) msg = `Екі судың жалпы көлемі ${CALMAX} л-ден аспауы керек, калориметрге одан көп сыймайды.`;
     } else if (id === "t1") {
-      if (x < ROOM || x > 100) { ok = false; msg = `Ыстық судың температурасы ${ROOM} °C пен 100 °C аралығында болуы керек (бастапқыда су бөлме температурасында, ${ROOM} °C).`; }
+      if (x < ROOM || x > 100) msg = `t₁ мәні ${ROOM} °C пен 100 °C аралығында болуы керек. Су плиткада бөлме температурасынан (${ROOM} °C) бастап қызады.`;
     } else if (id === "t2") {
-      if (x < 0 || x > 100) { ok = false; msg = "Суық судың температурасы 0 °C пен 100 °C аралығында болуы керек."; }
+      if (x < 0 || x > 100) msg = "t₂ мәні 0 °C пен 100 °C аралығында болуы керек.";
     }
-    if (ok) {
-      P[id] = Math.round(x * 1000) / 1000;
-      inp.classList.remove("bad");
-      inp.value = fmt(P[id], (P[id] % 1 === 0) ? 0 : (Math.round(P[id]*10) === P[id]*10 ? 1 : 2));
-      reset();
-    } else {
-      inp.classList.add("bad");
-      warn(msg);
-    }
-    return ok;
+    if (msg) { inp.classList.add("bad"); warn(msg); return false; }
+    P[id] = Math.round(x * 1000) / 1000;
+    inp.classList.remove("bad");
+    const d = P[id] % 1 === 0 ? 0 : (Math.abs(Math.round(P[id]*10) - P[id]*10) < 1e-9 ? 1 : 2);
+    inp.value = fmt(P[id], d);
+    reset();
+    return true;
   }
   for (const id in inputs) {
     const inp = inputs[id];
     inp.addEventListener("change", () => applyInput(id));
-    inp.addEventListener("keydown", e => { if (e.key === "Enter") { inp.blur(); } });
+    inp.addEventListener("keydown", e => { if (e.key === "Enter") inp.blur(); });
     inp.addEventListener("input", () => inp.classList.remove("bad"));
   }
 
   // ---------- Басқару ----------
-  $("bStart").onclick = () => {
-    if (!S.started) {
-      // енгізілген мәндердің бәрі дұрыс па
-      for (const id in inputs) if (!applyInput(id)) return;
-      S.started = true;
-    }
-    S.paused = false;
-  };
-  $("bPause").onclick = () => { if (S.started) S.paused = true; };
-  $("bStop").onclick = () => { reset(); };
-  const togglePlate = () => {
-    if (!canPlate()) return;
-    S.plateOn = !S.plateOn;
-  };
-  $("bPlate").onclick = togglePlate;
-  $("plate").addEventListener("click", togglePlate);
-  $("bPourHot").onclick = () => startPour("hot");
-  $("bPourCold").onclick = () => startPour("cold");
-
   const live = () => S.started && !S.paused;
   const canPlate = () => live() && S.hot.vol > 0 && !(S.pour && S.pour.who === "hot");
   const canPour = who => live() && !S.pour && S[who].vol > 0;
 
+  $("bStart").onclick = () => {
+    if (!S.started) { for (const id in inputs) if (!applyInput(id)) return; S.started = true; }
+    S.paused = false;
+  };
+  $("bPause").onclick = () => { if (S.started) S.paused = true; };
+  $("bStop").onclick = () => reset();
+  const togglePlate = () => { if (canPlate()) S.plateOn = !S.plateOn; };
+  $("bPlate").onclick = togglePlate;
+  $("plate").addEventListener("click", togglePlate);
   function startPour(who) {
     if (!canPour(who)) return;
     if (who === "hot") S.plateOn = false;
     S.pour = {who, t:0, v0:S[who].vol};
     S.settled = false;
   }
+  $("bPourHot").onclick = () => startPour("hot");
+  $("bPourCold").onclick = () => startPour("cold");
 
-  // ---------- Физика (бір қадам) ----------
+  // ---------- Физика ----------
   function step(dtw) {
     const dts = dtw * SPEED;
     S.time += dts;
+    S.glow += ((S.plateOn ? 1 : 0) - S.glow) * (1 - Math.exp(-dtw / 0.6));
 
-    // плитка қызуы (көрініс)
-    const target = S.plateOn ? 1 : 0;
-    S.glow += (target - S.glow) * (1 - Math.exp(-dtw / 0.8));
-
-    // ыстық суды қыздыру (термостат t₁-де өшіреді)
     if (S.plateOn && S.hot.vol > 0) {
-      const m = S.hot.vol * RHO / 1000;
-      S.hot.T += POWER * dts / (C * m);
-      if (S.hot.T >= P.t1) { S.hot.T = P.t1; S.plateOn = false; }
+      S.hot.T += POWER * dts / (C * S.hot.vol * RHO / 1000);
+      if (S.hot.T >= P.t1) { S.hot.T = P.t1; S.plateOn = false; }  // термостат
     }
 
-    // құю
     if (S.pour) {
       const p = S.pour, src = S[p.who];
       const t0 = PH.move + PH.tilt, t1 = t0 + PH.pour;
       const prev = p.t; p.t += dtw;
       const a = Math.max(prev, t0), b = Math.min(p.t, t1);
       if (b > a) {
-        let dv = p.v0 * (b - a) / PH.pour;
-        if (p.t >= t1) dv = src.vol; // соңғы қадамда қалғанының бәрі
-        dv = Math.min(dv, src.vol);
+        const dv = p.t >= t1 ? src.vol : Math.min(src.vol, p.v0 * (b - a) / PH.pour);
         if (dv > 0) {
           // жылу балансы: c·m_кал·(θ − t_кал) = c·dm·(t − θ)
           S.cal.T = (S.cal.vol * S.cal.T + dv * src.T) / (S.cal.vol + dv);
@@ -444,111 +423,103 @@
           if (src.vol < 1e-9) src.vol = 0;
         }
       }
-      if (p.t >= PH.move + PH.tilt + PH.pour + PH.untilt + PH.back) S.pour = null;
+      if (p.t >= t1 + PH.untilt + PH.back) S.pour = null;
     }
 
-    // термометрлердің инерциясы
     for (const k of ["hot", "cold", "cal"]) {
       const o = S[k], tau = k === "cal" ? 0.7 : 0.3;
       o.disp += (o.T - o.disp) * (1 - Math.exp(-dtw / tau));
       if (Math.abs(o.T - o.disp) < 0.004) o.disp = o.T;
     }
+    const mixing = S.cal.vol > 0 && (S.cal.disp !== S.cal.T || (S.pour && S.pour.t > PH.move + PH.tilt));
+    if (mixing) stirPhase += dtw * 7;
     S.settled = !S.pour && S.hot.vol === 0 && S.cold.vol === 0 && S.cal.disp === S.cal.T;
   }
 
-  // ---------- Сурет салу ----------
+  // ---------- Сурет ----------
   function vesselPose(who) {
     const p = S.pour;
     if (!p || p.who !== who) return {f:0, a:0};
-    const t = p.t, cfg = POUR[who];
+    const t = p.t, ang = POUR[who].ang;
     const m1 = PH.move, m2 = m1 + PH.tilt, m3 = m2 + PH.pour, m4 = m3 + PH.untilt, m5 = m4 + PH.back;
-    let f = 1, a = cfg.ang;
-    if (t < m1) { f = ease(t / m1); a = 0; }
-    else if (t < m2) { a = cfg.ang * ease((t - m1) / PH.tilt); }
-    else if (t < m3) { a = cfg.ang; }
-    else if (t < m4) { a = cfg.ang * (1 - ease((t - m3) / PH.untilt)); }
-    else if (t < m5) { a = 0; f = 1 - ease((t - m4) / PH.back); }
-    else { f = 0; a = 0; }
-    return {f, a};
+    if (t < m1) return {f:ease(t / m1), a:0};
+    if (t < m2) return {f:1, a:ang * ease((t - m1) / PH.tilt)};
+    if (t < m3) return {f:1, a:ang};
+    if (t < m4) return {f:1, a:ang * (1 - ease((t - m3) / PH.untilt))};
+    if (t < m5) return {f:1 - ease((t - m4) / PH.back), a:0};
+    return {f:0, a:0};
   }
 
   function render() {
-    // ыдыстар
     for (const who of ["hot", "cold"]) {
       const {f, a} = vesselPose(who), cfg = POUR[who];
-      const dx = (cfg.tx - cfg.px) * f, dy = (cfg.ty - cfg.py) * f;
-      vessels[who].g.setAttribute("transform", `translate(${dx} ${dy}) rotate(${a} ${cfg.px} ${cfg.py})`);
-      setVesselWater(who, S[who].vol, a);
+      vessels[who].g.setAttribute("transform", `translate(${(cfg.tx - cfg.px) * f} ${(cfg.ty - cfg.py) * f}) rotate(${a} ${cfg.px} ${cfg.py})`);
+      setVesselWater(who, S[who].vol, a, S[who].T);
     }
-    setVesselWater("cal", S.cal.vol, 0);
+    setVesselWater("cal", S.cal.vol, 0, S.cal.disp);
 
-    // ағын
-    const st = $("stream");
-    const p = S.pour;
+    const st = $("stream"), p = S.pour;
     if (p && p.t >= PH.move + PH.tilt * 0.8 && p.t < PH.move + PH.tilt + PH.pour) {
       const cfg = POUR[p.who], dir = p.who === "hot" ? 1 : -1;
-      const x = cfg.tx + dir * 4, y = cfg.ty + 2;
-      const ys = vessels.cal.bIn - S.cal.vol * G.cal.k;
+      const x = cfg.tx + dir * 3, y = cfg.ty + 2, ys = vessels.cal.bIn - S.cal.vol * G.cal.k;
       st.setAttribute("d", `M${x} ${y} q ${dir*7} 6 ${dir*9} 22 L${x + dir*9} ${ys}`);
-      st.setAttribute("opacity", .85);
+      st.setAttribute("stroke", heatColor(S[p.who].T));
+      st.setAttribute("opacity", .9);
     } else st.setAttribute("opacity", 0);
 
-    // плитка
-    plateGlowEl.setAttribute("opacity", S.glow.toFixed(3));
-    plateLamp.setAttribute("fill", S.plateOn ? "#ff3b2f" : "#5a2222");
-    const cx = (G.plate.x0 + G.plate.x1) / 2;
-    plateKnob.setAttribute("transform", `rotate(${S.plateOn ? 90 : 0} ${cx+40} ${G.plate.top+36})`);
+    stirrer.setAttribute("transform", `translate(0 ${(1 - Math.cos(stirPhase)) * -9})`);
 
-    // термометрлер мен көрсеткіштер
-    setThermo("hot", S.hot.disp);
-    setThermo("cold", S.cold.disp);
-    setThermo("cal", S.cal.disp);
+    plateGlowEl.setAttribute("opacity", S.glow.toFixed(3));
+    waves.setAttribute("opacity", (S.hot.vol > 0 && !(S.pour && S.pour.who === "hot") ? S.glow : 0).toFixed(3));
+    plateLamp.setAttribute("fill", S.plateOn ? "#FF5A36" : "#4A2A2A");
+    plateKnob.setAttribute("transform", `rotate(${S.plateOn ? 120 : 0} ${G.plate.x1-24} ${G.plate.top+27})`);
+
+    setGauge("hot", S.hot.disp);
+    setGauge("cold", S.cold.disp);
+    setGauge("cal", S.cal.disp);
     $("tCal").textContent = "t = " + fmt(S.cal.disp, 2) + " °C";
+    $("swatch").style.background = S.cal.vol > 0 ? heatColor(S.cal.disp) : "transparent";
     $("timer").textContent = fmt(S.time, 1);
 
-    // батырмалар
     $("bStart").disabled = S.started && !S.paused;
     $("bStart").classList.toggle("on", S.started && !S.paused);
     $("bPause").disabled = !S.started || S.paused;
     $("bPause").classList.toggle("on", S.paused);
     $("bStop").disabled = !S.started && S.time === 0;
     $("bPlate").disabled = !canPlate();
+    $("bPlate").classList.toggle("on", S.plateOn);
     $("bPlate").textContent = S.plateOn ? "Плитканы өшіру" : "Плитканы қосу";
     $("bPourHot").disabled = !canPour("hot");
     $("bPourCold").disabled = !canPour("cold");
     for (const id in inputs) inputs[id].disabled = S.started;
+    vessels.hot.g.classList.toggle("clickable", canPour("hot"));
+    vessels.cold.g.classList.toggle("clickable", canPour("cold"));
 
-    // хабарлама
     const stEl = $("status");
-    if (performance.now() < warnUntil) {
-      stEl.textContent = warnText; stEl.className = "warn";
-    } else {
-      stEl.textContent = statusText(); stEl.className = "";
-    }
+    if (performance.now() < warnUntil) { stEl.textContent = warnText; stEl.className = "warn"; }
+    else { stEl.textContent = statusText(); stEl.className = ""; }
   }
 
   function statusText() {
     const t1 = fmt(P.t1, P.t1 % 1 ? 1 : 0);
-    if (!S.started) return "Ыстық және суық судың параметрлерін енгізіп, «Пуск» батырмасын басыңыз.";
-    if (S.paused) return "Үзіліс. Жалғастыру үшін «Пуск» батырмасын басыңыз.";
-    if (S.pour) return S.pour.who === "hot" ? "Ыстық су калориметрге құйылып жатыр…" : "Суық су калориметрге құйылып жатыр…";
-    if (S.settled) return `Жылулық тепе-теңдік орнады: қоспаның температурасы t = ${fmt(S.cal.T, 2)} °C. Мәнді жазып алып, «Стоп» батырмасымен келесі тәжірибеге өтіңіз.`;
-    if (S.hot.vol === 0 && S.cold.vol === 0) return "Су араласып жатыр, калориметрдің термометрі тұрақталғанын күтіңіз…";
-    if (S.hot.vol > 0 && S.plateOn) return `Су қызып жатыр: ${fmt(S.hot.T, 1)} °C → t₁ = ${t1} °C.`;
-    if (S.hot.vol > 0 && S.hot.T < P.t1 - 1e-9) return `Плитканы қосып, ыстық суды t₁ = ${t1} °C температураға дейін қыздырыңыз.`;
-    if (S.hot.vol > 0 && S.cold.vol > 0) return `Ыстық су t₁ = ${t1} °C температураға жетті, плитка өшірілді. Енді ыстық суды, содан кейін суық суды калориметрге құйыңыз.`;
+    if (!S.started) return "Ыстық және суық судың көлемі мен температурасын жазып, «Пуск» батырмасын басыңыз.";
+    if (S.paused) return "Тәжірибе тоқтатылды. Жалғастыру үшін «Пуск» батырмасын басыңыз.";
+    if (S.pour) return S.pour.who === "hot" ? "Ыстық су калориметрге құйылып жатыр." : "Суық су калориметрге құйылып жатыр.";
+    if (S.settled) return `Жылулық тепе-теңдік орнады: қоспаның температурасы t = ${fmt(S.cal.T, 2)} °C. Мәнді жазып алып, келесі тәжірибе үшін «Стоп» батырмасын басыңыз.`;
+    if (S.hot.vol === 0 && S.cold.vol === 0) return "Су араласып жатыр. Калориметрдің термометрі тұрақталғанын күтіңіз.";
+    if (S.hot.vol > 0 && S.plateOn) return `Су қызып жатыр: ${fmt(S.hot.T, 1)} °C, қажетті температура t₁ = ${t1} °C.`;
+    if (S.hot.vol > 0 && S.hot.T < P.t1 - 1e-9) return `Плитканы қосып, ыстық суды t₁ = ${t1} °C-қа дейін қыздырыңыз.`;
+    if (S.hot.vol > 0 && S.cold.vol > 0) return `Ыстық су t₁ = ${t1} °C-қа жетті, плитка өшті. Енді ыстық суды, содан кейін суық суды калориметрге құйыңыз.`;
     if (S.hot.vol > 0) return "Енді ыстық суды калориметрге құйыңыз.";
     return "Енді суық суды калориметрге құйыңыз.";
   }
 
   // ---------- Іске қосу ----------
-  buildThermo("hot"); buildThermo("cal"); buildThermo("cold");
+  buildGauge("hot"); buildGauge("cal"); buildGauge("cold");
   buildPlate();
-  buildVessel("cal", $("calor"));
+  buildCalorimeter();
   buildVessel("cold", $("coldV"));
   buildVessel("hot", $("hotV"));
-  vessels.hot.g.classList.add("clickable");
-  vessels.cold.g.classList.add("clickable");
   vessels.hot.g.addEventListener("click", () => startPour("hot"));
   vessels.cold.g.addEventListener("click", () => startPour("cold"));
 
@@ -561,9 +532,7 @@
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
-
-  // тест үшін
-  window.__lab = {S, P, step, render};
+  window.__lab = {S, P};
 })();
 </script>
 </body>
